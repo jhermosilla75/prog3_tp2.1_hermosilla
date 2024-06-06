@@ -1,4 +1,18 @@
-class Sensor {}
+class Sensor {
+    constructor(id, name, type, value, unit, updated_at){
+        this.id = id;
+        this.name = name;
+        this.type  = type;
+        this.value = value;
+        this.unit = unit;
+        this.updated_at = updated_at;
+
+    }
+    set updateValue(newValue){
+        this.value = newValue
+        this.updated_at = new Date().toISOString()
+    }
+}
 
 class SensorManager {
     constructor() {
@@ -33,7 +47,28 @@ class SensorManager {
         }
     }
 
-    async loadSensors(url) {}
+    async loadSensors(url) {
+        try {
+            const response = await fetch(url);
+            if (response.ok){
+                const sensores = await response.json()
+                sensores.forEach(sensor => {
+                    try {
+                        let nuevoSensor = new Sensor(
+                            sensor.id, sensor.name, sensor.type, sensor.value, sensor.unit, sensor.updated_at
+                        )
+                        this.addSensor(nuevoSensor)
+                    } catch (error) {
+                        console.log(error, "error2");
+                    }
+                });
+                console.log(this.sensors)
+                this.render()
+            }
+        } catch (error) {
+            console.log("error1",error);
+        }
+    }
 
     render() {
         const container = document.getElementById("sensor-container");
