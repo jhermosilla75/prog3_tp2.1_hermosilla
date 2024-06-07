@@ -6,11 +6,44 @@ class Currency {
 }
 
 class CurrencyConverter {
-    constructor() {}
+    constructor(apiUrl) {
+        this.apiUrl = apiUrl;
+        this.currencies = [];
+    }
 
-    getCurrencies(apiUrl) {}
+    async getCurrencies() {
+        try {
+            const response = await fetch(`${this.apiUrl}/currencies`);
+            if (response.ok){
+                const currencies = await response.json()
+                Object.entries(currencies).forEach(([clave, valor]) => {
+                    let currency = new Currency(clave, valor)
+                    this.currencies.push(currency)                
+                });
+                console.log(this.currencies)
+            }
+        } catch (error) {
+            console.log("error",error.message);
+        }
 
-    convertCurrency(amount, fromCurrency, toCurrency) {}
+    }
+
+    async convertCurrency(amount, fromCurrency, toCurrency) {
+        if(fromCurrency == toCurrency){
+            return parseFloat(amount); 
+        }
+        try {
+            const response = await fetch(`${this.apiUrl}/latest?amount=${amount}&from=${fromCurrency.code}&to=${toCurrency.code}`);
+            if (response.ok){
+                const convertida = await response.json();
+                return convertida.rates[toCurrency.code];
+            }
+        } catch (error) {
+            console.log(error.message);
+            return null;
+            
+        }
+    }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -45,7 +78,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (convertedAmount !== null && !isNaN(convertedAmount)) {
             resultDiv.textContent = `${amount} ${
                 fromCurrency.code
-            } son ${convertedAmount.toFixed(2)} ${toCurrency.code}`;
+            } son ${convertedAmount.toFixed(2)} ${toCurrency.code} y aqui va la adicional`;
         } else {
             resultDiv.textContent = "Error al realizar la conversión.";
         }
