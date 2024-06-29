@@ -62,7 +62,7 @@ class SensorManager {
                         console.log(error, "error2");
                     }
                 });
-                console.log(this.sensors)
+                // console.log(this.sensors)
                 this.render()
             }
         } catch (error) {
